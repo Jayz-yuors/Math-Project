@@ -47,18 +47,39 @@ ensure_state_keys()
 # -------------------------
 # Input Form
 # -------------------------
+if 'start_coords' not in st.session_state:
+    st.session_state.start_coords = None
+if 'end_coords' not in st.session_state:
+    st.session_state.end_coords = None
+if 'start_place' not in st.session_state:
+    st.session_state.start_place = "Gateway of India, Mumbai"
+if 'end_place' not in st.session_state:
+    st.session_state.end_place = "Chhatrapati Shivaji Maharaj Terminus, Mumbai"
+
 with st.form("route_form"):
     col1, col2 = st.columns(2)
+    
     with col1:
-        start_query = st.text_input("Starting Point", "Gateway of India, Mumbai")
+        start_query = st.text_input("Starting Point", value=st.session_state.start_place, key="start_query")
         start_suggestions = suggest_places(start_query) if len(start_query) >= 1 else []
-        start_labels = [s["label"] for s in start_suggestions] or [start_query]
-        start_choice = st.selectbox("Select start", options=start_labels, index=0)
+        if start_suggestions:
+            start_labels = [s["label"] for s in start_suggestions]
+            selected_start = st.selectbox(
+                "Select starting point",
+                options=start_labels,
+                key="start_select"
+            )
+
     with col2:
-        end_query = st.text_input("Destination", "Chhatrapati Shivaji Maharaj Terminus, Mumbai")
+        end_query = st.text_input("Destination", value=st.session_state.end_place, key="end_query")
         end_suggestions = suggest_places(end_query) if len(end_query) >= 1 else []
-        end_labels = [s["label"] for s in end_suggestions] or [end_query]
-        end_choice = st.selectbox("Select destination", options=end_labels, index=0)
+        if end_suggestions:
+            end_labels = [s["label"] for s in end_suggestions]
+            selected_end = st.selectbox(
+                "Select destination",
+                options=end_labels,
+                key="end_select"
+            )
 
     col3, col4, col5 = st.columns(3)
     with col3:
@@ -90,13 +111,27 @@ with st.form("route_form"):
     submitted = st.form_submit_button("Find Path")
 
 if submitted:
-    st.info("Fetching coordinates and calculating route...")
+    # Update coordinates based on form selection
+    if start_suggestions and 'start_select' in st.session_state:
+        selected_start_place = next(s for s in start_suggestions if s["label"] == st.session_state.start_select)
+        st.session_state.start_coords = (selected_start_place["lat"], selected_start_place["lon"])
+        st.session_state.start_place = selected_start_place["label"]
+    
+    if end_suggestions and 'end_select' in st.session_state:
+        selected_end_place = next(s for s in end_suggestions if s["label"] == st.session_state.end_select)
+        st.session_state.end_coords = (selected_end_place["lat"], selected_end_place["lon"])
+        st.session_state.end_place = selected_end_place["label"]
 
-    # Try to use selected suggestions' coordinates; fallback to geocode
-    start_lookup = {s["label"]: (s["lat"], s["lon"]) for s in start_suggestions}
-    end_lookup = {s["label"]: (s["lat"], s["lon"]) for s in end_suggestions}
-    start_coords = start_lookup.get(start_choice) or get_coordinates(start_choice)
-    end_coords = end_lookup.get(end_choice) or get_coordinates(end_choice)
+    st.info("Calculating route...")
+
+    # Use stored coordinates or get them if needed
+    if not st.session_state.start_coords:
+        st.session_state.start_coords = get_coordinates(st.session_state.start_place)
+    if not st.session_state.end_coords:
+        st.session_state.end_coords = get_coordinates(st.session_state.end_place)
+    
+    start_coords = st.session_state.start_coords
+    end_coords = st.session_state.end_coords
 
     if start_coords and end_coords:
         client = openrouteservice.Client(key=OPENROUTESERVICE_API_KEY)
@@ -193,8 +228,8 @@ if submitted:
                 st.session_state.routes = collected
                 st.session_state.selected_route_index = 0
                 st.session_state.last_query = {
-                    "start": start_choice,
-                    "end": end_choice,
+                    "start": st.session_state.start_place,
+                    "end": st.session_state.end_place,
                     "start_coords": start_coords,
                     "end_coords": end_coords,
                     "units": units,
