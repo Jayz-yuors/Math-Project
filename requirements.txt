@@ -1,6 +1,5 @@
 # ======================================================
 # 🌆 Smart City Navigator - Requirements
-# Author: Jay Keluskar
 # Python Version: 3.10+
 # Description: Complete dependency list for Streamlit + OpenRouteService + Folium + Dijkstra Visualizer app
 # ======================================================
