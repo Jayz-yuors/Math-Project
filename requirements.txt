@@ -1,0 +1,52 @@
+# ======================================================
+# 🌆 Smart City Navigator - Requirements
+# Author: Jay Keluskar
+# Python Version: 3.10+
+# Description: Complete dependency list for Streamlit + OpenRouteService + Folium + Dijkstra Visualizer app
+# ======================================================
+
+# ---- Core Python Version ----
+python_version >= 3.10
+
+# ---- Core Web Framework ----
+streamlit==1.39.0              # Main web framework for UI
+streamlit-folium==0.21.1       # Integration of Folium maps in Streamlit
+
+# ---- Mapping & Geospatial Libraries ----
+openrouteservice==2.3.3        # Routing and geolocation API client
+folium==0.17.0                 # Interactive map rendering
+
+# ---- Data Handling & Logic ----
+rapidfuzz==3.9.3               # For fuzzy search & location name matching
+typing_extensions>=4.9.0       # Backward compatibility for typing
+
+# ---- Utility Dependencies ----
+requests>=2.31.0               # API requests handling
+numpy>=1.26.0                  # Mathematical operations
+pandas>=2.2.0                  # Optional: for any future data manipulation
+jsonschema>=4.21.0             # JSON validation support
+python-dotenv>=1.0.1           # Optional: For environment variable (API key) handling
+
+# ---- Visualization Helpers (optional but recommended) ----
+branca>=0.7.0                  # Folium map component rendering
+jinja2>=3.1.3                  # Template rendering for maps
+
+# ---- Dev Utilities ----
+watchdog>=4.0.1                # Auto-reload for Streamlit during development
+pip>=24.0                      # Ensure modern dependency resolver
+
+# ======================================================
+# ✅ Notes:
+# 1. Create a virtual environment before installing:
+#       python -m venv venv
+#       venv\Scripts\activate    (Windows)
+#       source venv/bin/activate (Mac/Linux)
+#
+# 2. Install dependencies:
+#       pip install -r requirements.txt
+#
+# 3. To run the app:
+#       streamlit run pro1.py
+#
+# 4. Make sure to set your OpenRouteService API key inside pro1.py
+# ======================================================
